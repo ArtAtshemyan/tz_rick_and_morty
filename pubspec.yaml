@@ -35,6 +35,35 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  # Bloc / Cubit for state management
+  bloc: any
+  flutter_bloc: any
+
+  # Remote API
+  dio: any
+
+  # Local cache
+  shared_preferences: any
+
+  # Value equality
+  equatable: any
+
+  # DI(iOC locator, Dependency Injection )
+  get_it: any
+
+  # Internet Connection Checker
+  internet_connection_checker: any
+
+  # Functional programming thingies
+  dartz: any
+
+  # Cached Network Image
+  cached_network_image: any
+
+  # Logger
+  pretty_dio_logger: any
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
