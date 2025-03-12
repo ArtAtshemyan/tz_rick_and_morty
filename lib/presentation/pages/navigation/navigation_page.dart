@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:rick_and_morty/presentation/widgets/theme_toggle_button.dart';
 
 import '/presentation/pages/characters/charaters_page.dart';
 import '/presentation/pages/favorite_character/favorite_character_page.dart';
+import '/presentation/widgets/theme_toggle_button.dart';
 
 class NavigationPage extends StatefulWidget {
   const NavigationPage({super.key});
@@ -27,9 +27,7 @@ class _NavigationPageState extends State<NavigationPage> {
           'Rick and Morty',
         ),
         centerTitle: true,
-        actions: [
-          ThemeToggleButton(),
-        ],
+        actions: [ThemeToggleButton()],
       ),
       body: _widgetOptions.elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(
