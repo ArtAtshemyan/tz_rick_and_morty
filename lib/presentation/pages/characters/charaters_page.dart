@@ -79,6 +79,7 @@ class _CharactersPageState extends State<CharactersPage> {
             if (index < character.length) {
               bool isFavorite = favoriteIds.contains(character[index].id);
               return CharacterCard(
+                key: ValueKey(character[index].id),
                 character: character[index],
                 isFavorite: isFavorite,
               );

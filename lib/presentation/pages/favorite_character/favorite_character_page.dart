@@ -70,6 +70,7 @@ class _FavoriteCharacterPageState extends State<FavoriteCharacterPage> {
             child: ListView.separated(
               itemBuilder: (context, index) {
                 return CharacterCard(
+                  key: ValueKey(character[index].id),
                   character: character[index],
                   isFavorite: favoriteIds.contains(character[index].id),
                 );
