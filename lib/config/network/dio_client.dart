@@ -4,10 +4,7 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 import '/common/constants/app_urls.dart';
 
-const String applicationJson = "application/json";
-const String contentType = "content-type";
-const String accept = "accept";
-const int apiTimeOut = 60000;
+const int apiTimeOut = 90000;
 
 class DioClient {
   late final Dio _dio;

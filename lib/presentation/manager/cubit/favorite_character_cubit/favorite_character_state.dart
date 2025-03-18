@@ -16,15 +16,13 @@ class FavoriteCharactersLoading extends FavoriteCharacterState {
 
 class FavoriteCharactersLoaded extends FavoriteCharacterState {
   final List<CharacterEntity> characters;
-  final List<int> favoriteIds;
 
   const FavoriteCharactersLoaded({
     required this.characters,
-    required this.favoriteIds,
   });
 
   @override
-  List<Object?> get props => [characters, favoriteIds];
+  List<Object?> get props => [characters];
 }
 
 class FavoriteCharactersError extends FavoriteCharacterState {

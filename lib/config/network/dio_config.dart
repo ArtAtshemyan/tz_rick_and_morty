@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import '/common/constants/app_strings.dart';
 
+import '/common/constants/app_strings.dart';
 import 'failure.dart';
 
 class ErrorHandler implements Exception {
@@ -186,7 +186,7 @@ class ResponseMessage {
   static const String cacheError = AppStrings.strCacheError;
   static const String noInternetConnection = AppStrings.strNoInternetError;
   static const String defaultError = AppStrings.strDefaultError;
-  static const String connectionError = AppStrings.strDefaultError;
+  static const String connectionError = AppStrings.connectionError;
 }
 
 class ApiInternalStatus {

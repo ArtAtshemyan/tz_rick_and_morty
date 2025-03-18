@@ -1,21 +1,18 @@
-import 'dart:convert';
-
 import 'package:dartz/dartz.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '/common/constants/app_urls.dart';
-import '/common/constants/shared_preferences_keys.dart';
 import '/config/connection/network_connection.dart';
 import '/config/network/dio_client.dart';
 import '/config/network/dio_config.dart';
 import '/config/network/failure.dart';
+import '/data/source/local/character_local_data_source.dart';
 import '/domain/entities/character_entity.dart';
 import '/domain/entities/characters_entity.dart';
 import '/domain/repositories/character_repository.dart';
 
 class CharacterRepositoryImpl implements CharacterRepository {
   final DioClient remoteDataSource;
-  final SharedPreferences localDataSource;
+  final CharacterLocalDataSource localDataSource;
   final NetworkConnection networkInfo;
 
   CharacterRepositoryImpl({
@@ -29,50 +26,37 @@ class CharacterRepositoryImpl implements CharacterRepository {
       int page) async {
     if (await networkInfo.isConnected) {
       try {
-        final pageCount = page > 42 ? 42 : page;
         final remoteCharacter = await remoteDataSource
-            .get('${AppUrls.characterEndpoint}?page=$pageCount');
+            .get('${AppUrls.characterEndpoint}?page=$page');
         final result = CharactersEntity.fromJson(remoteCharacter.data);
-        _characterToCache(result.characters, SharedPreferencesKeys.characters);
+
+        if (page == 1 || page == 2) {
+          // Сохраняем в локальную БД для кэширования
+          await localDataSource.charactersToCatchInLocalDB(result.characters);
+        }
+
+        // Возвращаем успешный результат с персонажами
         return Right(result.characters);
       } catch (error) {
         return Left(ErrorHandler.handle(error).failure);
       }
     } else {
       try {
-        final localCharacter =
-            await _getLastCharacterFromCache(SharedPreferencesKeys.characters);
-        return Right(localCharacter);
+        // Получаем данные из локальной БД, если нет интернета
+        final localCharacterResponse =
+            await localDataSource.fetchCharactersFromLocalDB();
+
+        // Используем fold, чтобы обработать оба варианта (ошибка или успех)
+        return localCharacterResponse.fold(
+          (failure) => Left(failure),
+          (localCharacters) => Right(localCharacters),
+        );
       } catch (error) {
-        return Left(ErrorHandler.handle(error).failure);
+        // В случае ошибки при работе с локальной БД
+        return Left(
+          DataSource.connectionError.getFailure(),
+        );
       }
     }
-  }
-
-  Future<List<CharacterEntity>> _getLastCharacterFromCache(String key) {
-    final jsonCharactersList = localDataSource.getStringList(key);
-    if (jsonCharactersList!.isNotEmpty) {
-      return Future.value(
-        jsonCharactersList
-            .map(
-              (character) => CharacterEntity.fromJson(
-                json.decode(character),
-              ),
-            )
-            .toList(),
-      );
-    } else {
-      final error = Failure(500, 'There are currently no saved heroes.');
-      throw error.message;
-    }
-  }
-
-  Future<List<String>> _characterToCache(
-      List<CharacterEntity> characters, String key) {
-    final List<String> jsonCharactersList =
-        characters.map((character) => json.encode(character.toJson())).toList();
-
-    localDataSource.setStringList(key, jsonCharactersList);
-    return Future.value(jsonCharactersList);
   }
 }

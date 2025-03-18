@@ -13,7 +13,9 @@ class AppStrings {
   static const String strInternalServerError = "internal_server_error";
   static const String strUnknownError = "unknown_error";
   static const String strTimeoutError = "timeout_error";
-  static const String strDefaultError = "There are currently no saved heroes.";
+  static const String strDefaultError = "default_error";
+  static const String cancel = "cancel_error";
+  static const String connectionError = "connection_error";
   static const String strCacheError = "cache_error";
   static const String strNoInternetError = "no_internet_error";
 }

@@ -1,13 +1,28 @@
+import 'package:hive/hive.dart';
+
+part 'character_entity.g.dart';
+
+@HiveType(typeId: 0)
 class CharacterEntity {
+  @HiveField(0)
   final int id;
+  @HiveField(1)
   final String name;
+  @HiveField(2)
   final String status;
+  @HiveField(3)
   final String species;
+  @HiveField(4)
   final String gender;
+  @HiveField(5)
   final String image;
+  @HiveField(6)
   final Location location;
+  @HiveField(7)
   final Origin origin;
+  @HiveField(8)
   final List<String> episode;
+  @HiveField(9)
   final bool isFavorite;
 
   CharacterEntity({
@@ -75,8 +90,11 @@ class CharacterEntity {
   }
 }
 
+@HiveType(typeId: 1)
 class Location {
+  @HiveField(0)
   final String name;
+  @HiveField(1)
   final String url;
 
   Location({required this.name, required this.url});
@@ -91,8 +109,11 @@ class Location {
       };
 }
 
+@HiveType(typeId: 2)
 class Origin {
+  @HiveField(0)
   final String name;
+  @HiveField(1)
   final String url;
 
   Origin({required this.name, required this.url});

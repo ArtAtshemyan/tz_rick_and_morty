@@ -16,7 +16,6 @@ class FavoriteCharacterPage extends StatefulWidget {
 
 class _FavoriteCharacterPageState extends State<FavoriteCharacterPage> {
   List<CharacterEntity> character = [];
-  List<int> favoriteIds = [];
 
   @override
   void initState() {
@@ -37,7 +36,6 @@ class _FavoriteCharacterPageState extends State<FavoriteCharacterPage> {
           );
         } else if (state is FavoriteCharactersLoaded) {
           character = state.characters;
-          favoriteIds = state.favoriteIds;
         } else if (state is FavoriteCharactersError) {
           return Center(
             child: Column(
@@ -72,7 +70,8 @@ class _FavoriteCharacterPageState extends State<FavoriteCharacterPage> {
                 return CharacterCard(
                   key: ValueKey(character[index].id),
                   character: character[index],
-                  isFavorite: favoriteIds.contains(character[index].id),
+                  isFavorite: true,
+                  index: index,
                 );
               },
               separatorBuilder: (context, index) {
