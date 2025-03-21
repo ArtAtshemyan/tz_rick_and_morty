@@ -19,6 +19,7 @@ class CharactersPage extends StatefulWidget {
 class _CharactersPageState extends State<CharactersPage> {
   final scrollController = ScrollController();
   late InternetConnectionChecker connectionChecker;
+  StreamSubscription? connectionSubscription;
 
   List<int> favoriteIds = [];
   List<CharacterEntity> character = [];
@@ -110,8 +111,10 @@ class _CharactersPageState extends State<CharactersPage> {
 
   @override
   void initState() {
+    super.initState();
     connectionChecker = sl<InternetConnectionChecker>();
-    connectionChecker.onStatusChange.listen((status) {
+    connectionSubscription = connectionChecker.onStatusChange.listen((status) {
+      if (!mounted) return;
       setState(() {
         isConnected = status == InternetConnectionStatus.connected;
       });
@@ -121,13 +124,12 @@ class _CharactersPageState extends State<CharactersPage> {
         scrollController.addListener(_scrollListener);
       }
     });
-    context.read<CharacterCubit>().loadCharacters();
-    super.initState();
+    setState(() {});
   }
 
   @override
   void dispose() {
-    scrollController.removeListener(_scrollListener);
+    connectionSubscription?.cancel();
     scrollController.dispose();
     super.dispose();
   }
