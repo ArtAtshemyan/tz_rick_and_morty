@@ -1,13 +1,10 @@
 import 'package:dartz/dartz.dart';
-import '/domain/entities/character_entity.dart';
 
 import '/config/network/failure.dart';
+import '/domain/entities/character_entity.dart';
 
 abstract class FavoriteCharacterRepository {
-  Future<Either<Failure, List<CharacterEntity>>> fetchCharactersByIds(
-      List<int> ids);
-  void storeCharacters(List<String> characters);
-  void saveCharacter(int id);
-  void removeCharacter(int id);
-  List<int> getSavedCharacters();
+  Future<Either<Failure, List<CharacterEntity>>> fetchFavoritesCharacter();
+  void saveCharacter(CharacterEntity character);
+  void removeCharacter(int index);
 }

@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
+import '/config/cetch/catch_manager.dart';
+
 class CharacterCacheImage extends StatelessWidget {
   final String imageUrl;
   final double? width, height;
@@ -27,6 +29,7 @@ class CharacterCacheImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CachedNetworkImage(
+      cacheManager: CustomCacheManager.instance,
       width: width,
       height: height,
       imageUrl: imageUrl,

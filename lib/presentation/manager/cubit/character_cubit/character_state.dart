@@ -40,8 +40,8 @@ class CharactersLoaded extends CharacterState {
 }
 
 class CharactersError extends CharacterState {
-  final String message;
-  const CharactersError(this.message);
+  final Failure failure;
+  const CharactersError(this.failure);
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [failure];
 }

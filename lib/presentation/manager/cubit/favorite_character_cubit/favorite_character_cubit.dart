@@ -18,16 +18,15 @@ class FavoriteCharacterCubit extends Cubit<FavoriteCharacterState> {
   Future<void> loadFavoriteCharacters() async {
     emit(FavoriteCharactersLoading());
     try {
-      final favoriteIds = _favoriteCharacterRepository.getSavedCharacters();
       final characters =
-          await _favoriteCharacterRepository.fetchCharactersByIds(favoriteIds);
+          await _favoriteCharacterRepository.fetchFavoritesCharacter();
+
       characters.fold(
         (error) =>
             emit(FavoriteCharactersError(ErrorHandler.handle(error).failure)),
         (characterList) {
           emit(FavoriteCharactersLoaded(
             characters: characterList,
-            favoriteIds: favoriteIds.isNotEmpty ? favoriteIds : [],
           ));
         },
       );
@@ -37,39 +36,53 @@ class FavoriteCharacterCubit extends Cubit<FavoriteCharacterState> {
     }
   }
 
-  Future<void> deleteFavoriteCharacters(int id) async {
-    _favoriteCharacterRepository.removeCharacter(id);
-    final favoriteIds = _favoriteCharacterRepository.getSavedCharacters();
+  Future<void> deleteFavoriteCharacters(int index) async {
+    try {
+      _favoriteCharacterRepository.removeCharacter(index);
+      final favoriteIds =
+          await _favoriteCharacterRepository.fetchFavoritesCharacter();
 
-    if (state is FavoriteCharactersLoaded) {
-      final currentState = state as FavoriteCharactersLoaded;
-      final filteredCharacters = currentState.characters
-          .where((char) => favoriteIds.contains(char.id))
-          .toList();
-      emit(FavoriteCharactersLoaded(
-        characters: filteredCharacters,
-        favoriteIds: favoriteIds,
-      ));
-    } else {
-      await loadFavoriteCharacters();
+      if (state is FavoriteCharactersLoaded) {
+        favoriteIds.fold(
+          (error) =>
+              emit(FavoriteCharactersError(ErrorHandler.handle(error).failure)),
+          (characterList) {
+            emit(FavoriteCharactersLoaded(
+              characters: characterList,
+            ));
+          },
+        );
+      } else {
+        await loadFavoriteCharacters();
+      }
+    } catch (error) {
+      final errorText = ErrorHandler.handle(error).failure;
+      emit(FavoriteCharactersError(errorText));
     }
   }
 
-  Future<void> saveFavoriteCharacters(int id) async {
-    _favoriteCharacterRepository.saveCharacter(id);
-    final favoriteIds = _favoriteCharacterRepository.getSavedCharacters();
+  Future<void> saveFavoriteCharacters(CharacterEntity character) async {
+    try {
+      _favoriteCharacterRepository.saveCharacter(character);
+      final favoriteIds =
+          await _favoriteCharacterRepository.fetchFavoritesCharacter();
 
-    if (state is FavoriteCharactersLoaded) {
-      final currentState = state as FavoriteCharactersLoaded;
-      final filteredCharacters = currentState.characters
-          .where((char) => favoriteIds.contains(char.id))
-          .toList();
-      emit(FavoriteCharactersLoaded(
-        characters: filteredCharacters,
-        favoriteIds: favoriteIds,
-      ));
-    } else {
-      await loadFavoriteCharacters();
+      if (state is FavoriteCharactersLoaded) {
+        favoriteIds.fold(
+          (error) =>
+              emit(FavoriteCharactersError(ErrorHandler.handle(error).failure)),
+          (characterList) {
+            emit(FavoriteCharactersLoaded(
+              characters: characterList,
+            ));
+          },
+        );
+      } else {
+        await loadFavoriteCharacters();
+      }
+    } catch (error) {
+      final errorText = ErrorHandler.handle(error).failure;
+      emit(FavoriteCharactersError(errorText));
     }
   }
 }

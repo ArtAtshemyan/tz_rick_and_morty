@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
+import 'package:rick_and_morty/locator_service.dart';
 
 import '/domain/entities/character_entity.dart';
 import '/presentation/manager/cubit/character_cubit/character_cubit.dart';
@@ -16,36 +18,12 @@ class CharactersPage extends StatefulWidget {
 
 class _CharactersPageState extends State<CharactersPage> {
   final scrollController = ScrollController();
+  late InternetConnectionChecker connectionChecker;
 
   List<int> favoriteIds = [];
   List<CharacterEntity> character = [];
   bool isLoading = false;
-
-  void setupScrollController(BuildContext context) {
-    scrollController.addListener(() {
-      if (scrollController.position.atEdge) {
-        if (scrollController.position.pixels != 0) {
-          context.read<CharacterCubit>().loadCharacters();
-        }
-      }
-    });
-  }
-
-  @override
-  void initState() {
-    setupScrollController(context);
-    context.read<CharacterCubit>().loadCharacters();
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    scrollController.dispose();
-    favoriteIds = [];
-    character = [];
-    isLoading = false;
-    super.dispose();
-  }
+  bool isConnected = true;
 
   @override
   Widget build(BuildContext context) {
@@ -67,8 +45,8 @@ class _CharactersPageState extends State<CharactersPage> {
         favoriteIds = state.favoriteIds;
       } else if (state is CharactersError) {
         return Text(
-          state.message,
-          style: const TextStyle(color: Colors.white, fontSize: 25),
+          state.failure.message,
+          style: const TextStyle(color: Colors.red, fontSize: 25),
         );
       }
       return Padding(
@@ -82,13 +60,18 @@ class _CharactersPageState extends State<CharactersPage> {
                 key: ValueKey(character[index].id),
                 character: character[index],
                 isFavorite: isFavorite,
+                index: index,
               );
             } else {
-              Timer(const Duration(milliseconds: 30), () {
-                scrollController
-                    .jumpTo(scrollController.position.maxScrollExtent);
-              });
-              return _loadingIndicator();
+              if (isConnected) {
+                Timer(const Duration(milliseconds: 30), () {
+                  scrollController
+                      .jumpTo(scrollController.position.maxScrollExtent);
+                });
+                return _loadingIndicator();
+              } else {
+                return SizedBox();
+              }
             }
           },
           separatorBuilder: (context, index) {
@@ -109,5 +92,43 @@ class _CharactersPageState extends State<CharactersPage> {
         child: CircularProgressIndicator(),
       ),
     );
+  }
+
+  void _scrollListener() {
+    if (scrollController.position.atEdge) {
+      if (scrollController.position.pixels != 0) {
+        context.read<CharacterCubit>().loadCharacters();
+      }
+    }
+  }
+
+  void setupScrollController(BuildContext context) {
+    if (isConnected) {
+      scrollController.addListener(_scrollListener);
+    }
+  }
+
+  @override
+  void initState() {
+    connectionChecker = sl<InternetConnectionChecker>();
+    connectionChecker.onStatusChange.listen((status) {
+      setState(() {
+        isConnected = status == InternetConnectionStatus.connected;
+      });
+      if (!isConnected) {
+        scrollController.removeListener(_scrollListener);
+      } else {
+        scrollController.addListener(_scrollListener);
+      }
+    });
+    context.read<CharacterCubit>().loadCharacters();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    scrollController.removeListener(_scrollListener);
+    scrollController.dispose();
+    super.dispose();
   }
 }

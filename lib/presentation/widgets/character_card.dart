@@ -4,17 +4,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '/common/extension/context_extension.dart';
 import '/common/theme/app_colors.dart';
 import '/domain/entities/character_entity.dart';
+import '/presentation/manager/cubit/character_cubit/character_cubit.dart';
 import '/presentation/manager/cubit/favorite_character_cubit/favorite_character_cubit.dart';
 import '/presentation/widgets/character_cache_image.dart';
 
 class CharacterCard extends StatefulWidget {
   final CharacterEntity character;
   final bool isFavorite;
+  final int index;
 
   const CharacterCard({
     super.key,
     required this.character,
     required this.isFavorite,
+    required this.index,
   });
 
   @override
@@ -33,16 +36,16 @@ class _CharacterCardState extends State<CharacterCard> {
   void _favoriteCharacter() {
     if (isFavorite) {
       context.read<FavoriteCharacterCubit>().deleteFavoriteCharacters(
-            widget.character.id,
+            widget.index,
           );
       isFavorite = false;
     } else {
       context.read<FavoriteCharacterCubit>().saveFavoriteCharacters(
-            widget.character.id,
+            widget.character,
           );
       isFavorite = true;
     }
-
+    context.read<CharacterCubit>().loadCharacters();
     setState(() {});
   }
 
