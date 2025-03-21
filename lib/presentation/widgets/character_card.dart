@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '/common/extension/context_extension.dart';
 import '/common/theme/app_colors.dart';
 import '/domain/entities/character_entity.dart';
-import '/presentation/manager/cubit/character_cubit/character_cubit.dart';
 import '/presentation/manager/cubit/favorite_character_cubit/favorite_character_cubit.dart';
 import '/presentation/widgets/character_cache_image.dart';
 
@@ -33,19 +32,21 @@ class _CharacterCardState extends State<CharacterCard> {
     super.initState();
   }
 
-  void _favoriteCharacter() {
+  void _favoriteCharacter(BuildContext context) {
     if (isFavorite) {
-      context.read<FavoriteCharacterCubit>().deleteFavoriteCharacters(
-            widget.index,
-          );
       isFavorite = false;
+      Future.delayed(Duration(seconds: 1), () {
+        if (!context.mounted) return;
+        context
+            .read<FavoriteCharacterCubit>()
+            .deleteFavoriteCharacters(widget.index);
+      });
     } else {
+      isFavorite = true;
       context.read<FavoriteCharacterCubit>().saveFavoriteCharacters(
             widget.character,
           );
-      isFavorite = true;
     }
-    context.read<CharacterCubit>().loadCharacters();
     setState(() {});
   }
 
@@ -138,7 +139,7 @@ class _CharacterCardState extends State<CharacterCard> {
           top: 40,
           right: 10,
           child: IconButton(
-            onPressed: () => _favoriteCharacter(),
+            onPressed: () => _favoriteCharacter(context),
             icon: Icon(
               isFavorite ? Icons.bookmark : Icons.bookmark_outline,
               size: 44.0,
