@@ -19,7 +19,7 @@ class CharacterCubit extends Cubit<CharacterState> {
 
   int page = 1;
 
-  Future<void> loadCharacters({bool? newPage}) async {
+  Future<void> loadCharacters({bool? isNoneNewPage}) async {
     if (state is CharactersLoading) return;
 
     final currentState = state;
@@ -29,13 +29,10 @@ class CharacterCubit extends Cubit<CharacterState> {
       oldCharacter = currentState.characters;
     }
 
-    /// Ожидаем результат для списка избранных персонажей
     final favoriteResult =
         await _favoriteCharacterRepository.fetchFavoritesCharacter();
     var favoriteIds = [];
     favoriteResult.fold((failure) => emit(CharactersError(failure)),
-
-        /// Извлекаем только ID избранных персонажей
         (characters) {
       favoriteIds = characters.map((e) => e.id).toList();
     });
@@ -49,11 +46,11 @@ class CharacterCubit extends Cubit<CharacterState> {
     );
 
     try {
-      if (newPage != null && newPage == true && page > 1) {
+      if (isNoneNewPage != null && isNoneNewPage == true && page > 1) {
         page = page - 1;
       }
       final characters = await _characterRepository.fetchCharacters(page);
-      if (page < 43) {
+      if (page < 42) {
         page++;
       }
       characters.fold(
@@ -62,7 +59,11 @@ class CharacterCubit extends Cubit<CharacterState> {
         ),
         (characterList) {
           final newCharacter = (state as CharactersLoading).oldCharacterList;
-          newCharacter.addAll(characterList);
+          for (var character in characterList) {
+            if (!newCharacter.contains(character)) {
+              newCharacter.add(character);
+            }
+          }
           emit(
             CharactersLoaded(
               characters: newCharacter,

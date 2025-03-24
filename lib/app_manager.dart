@@ -20,7 +20,10 @@ class AppManager extends StatelessWidget {
           ),
         ),
         BlocProvider(
-          create: (context) => sl<CharacterCubit>(),
+          create: (context) => sl<CharacterCubit>()
+            ..loadCharacters(
+              isNoneNewPage: true,
+            ),
         ),
         BlocProvider(
           create: (context) => sl<FavoriteCharacterCubit>(),

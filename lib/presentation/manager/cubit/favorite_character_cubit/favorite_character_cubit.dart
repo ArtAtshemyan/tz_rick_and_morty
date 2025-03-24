@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:rick_and_morty/domain/entities/character_entity.dart';
 
 import '/config/network/dio_config.dart';
 import '/config/network/failure.dart';
+import '/domain/entities/character_entity.dart';
 import '/domain/repositories/favorite_character_repository.dart';
 
 part 'favorite_character_state.dart';
